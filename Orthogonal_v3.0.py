@@ -18,7 +18,7 @@ test_dataset = datasets.MNIST(root='./data', train=False, download=True, transfo
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 # Split dataset among multiple clients
-num_clients = 3  # Number of clients in the simulation
+num_clients = 10  # Number of clients in the simulation
 dataset_size = len(train_dataset)
 indices = np.array_split(np.arange(dataset_size), num_clients)
 client_datasets = [Subset(train_dataset, idx) for idx in indices]
@@ -32,7 +32,7 @@ for i in range(num_clients):
     clients.append((trainer, train_loader))
 
 # Initialize global model for Federated Learning simulation
-num_rounds = 50  # Increased rounds
+num_rounds = 3 # Increased rounds
 global_model = NeuralNetwork()
 global_trainer = Trainer(global_model, lr=0.01)
 
