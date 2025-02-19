@@ -2,7 +2,8 @@
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-from CNN import NeuralNetwork, Trainer
+# from CNN import NeuralNetwork, Trainer
+from NN import NeuralNetwork, Trainer 
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
 
@@ -26,14 +27,14 @@ client_datasets = [Subset(train_dataset, idx) for idx in indices]
 # Initialize models and trainers for each client
 clients = []
 for i in range(num_clients):
-    model = NeuralNetwork()
+    model = NeuralNetwork(layer_1=128)
     trainer = Trainer(model, lr=0.01)
     train_loader = DataLoader(client_datasets[i], batch_size=10, shuffle=True)
     clients.append((trainer, train_loader))
 
 # Initialize global model for Federated Learning simulation
 num_rounds = 10 # Increased rounds
-global_model = NeuralNetwork()
+global_model = NeuralNetwork(layer_1=128)
 global_trainer = Trainer(global_model, lr=0.01)
 
 def aggregate_weights(client_trainers):
