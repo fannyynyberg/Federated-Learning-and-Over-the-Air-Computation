@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from NeuralNetwork import NeuralNetwork, Trainer
+from CNN import NeuralNetwork, Trainer
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
 

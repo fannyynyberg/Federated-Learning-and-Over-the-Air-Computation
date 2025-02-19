@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-from NeuralNetwork import NeuralNetwork, Trainer
+from CNN import NeuralNetwork, Trainer
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
 
@@ -15,10 +15,10 @@ train_dataset = datasets.MNIST(root='./data', train=True, download=True, transfo
 test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
 
 # Create DataLoader for test dataset
-test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+test_loader = DataLoader(test_dataset, batch_size=10, shuffle=False)
 
 # Split dataset among multiple clients
-num_clients = 10  # Number of clients in the simulation
+num_clients = 3  # Number of clients in the simulation
 dataset_size = len(train_dataset)
 indices = np.array_split(np.arange(dataset_size), num_clients)
 client_datasets = [Subset(train_dataset, idx) for idx in indices]
@@ -28,11 +28,11 @@ clients = []
 for i in range(num_clients):
     model = NeuralNetwork()
     trainer = Trainer(model, lr=0.01)
-    train_loader = DataLoader(client_datasets[i], batch_size=32, shuffle=True)
+    train_loader = DataLoader(client_datasets[i], batch_size=10, shuffle=True)
     clients.append((trainer, train_loader))
 
 # Initialize global model for Federated Learning simulation
-num_rounds = 3 # Increased rounds
+num_rounds = 10 # Increased rounds
 global_model = NeuralNetwork()
 global_trainer = Trainer(global_model, lr=0.01)
 
