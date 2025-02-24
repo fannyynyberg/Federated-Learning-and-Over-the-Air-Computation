@@ -1,121 +1,136 @@
-"""Optimized Orthogonal simulation with calculated validation accuracy."""
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.utils.data as data
+import torchvision.transforms as transforms
+import torchvision.datasets as datasets
+import numpy as np
 import matplotlib.pyplot as plt
-from CNN import NeuralNetwork
-from torch.utils.data import DataLoader, Subset
-from torchvision import datasets, transforms
+from NN2 import NeuralNetwork
 
-# Enhet (GPU om tillgänglig)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Using device: {device}")
+# Federated Learning setup
+num_clients = 20
+num_rounds = 100
+epochs = 2
+learning_rate = 0.01
 
-# Dataset & Transformering
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,))
-])
+# Transformation pipeline that converts images into PyTorch tensors and normalizes pixel values
+transform = transforms.Compose([transforms.ToTensor()])
+# Load MNIST dataset
+mnist_data = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
+# Splits the dataset between clients
+client_data = torch.utils.data.random_split(mnist_data, [len(mnist_data)//num_clients]*num_clients)
 
-# Laddar MNIST-datasetet
-train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+# Define training model for local model
+def train_local(client_model, data_loader, optimizer, criterion):
+    # Set model to training mode
+    client_model.train()
+    # Iterate over the training data
+    for images, labels in data_loader:
+        # Clears the gradient before a new batch is processed
+        optimizer.zero_grad()
+        # Produces ten outputs
+        outputs = client_model(images)
+        # Compares model prediction with actual labels, where loss quantifies how far off the predictions are
+        loss = criterion(outputs, labels)
+        # Computes gradients of the loss with respect to model weights using backpropagation
+        loss.backward()
+        # Updates the model's weights using computed gradients
+        optimizer.step()
 
-# Skapa DataLoader för testning
-test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+# Define federated averaging function
+def federated_avg(weights):
+    # Initialize a dictionary to store the average weights
+    avg_weights = {}
+    # Iterate over the keys of the weights dictionary
+    for key in weights[0].keys():
+        # Compute the average of the weights for each key
+        avg_weights[key] = sum(w[key] for w in weights) / len(weights)
+        # Convert the average to a tensor
+    return avg_weights
 
-# Split dataset among multiple clients (Minskat till 10 klienter)
-num_clients = 10  
-dataset_size = len(train_dataset)
-indices = np.array_split(np.arange(dataset_size), num_clients)
-client_datasets = [Subset(train_dataset, idx) for idx in indices]
-
-# Neural Network Training Class
-class Trainer:
-    def __init__(self, model, lr=0.01):
-        self.model = model.to(device)
-        self.optimizer = optim.SGD(self.model.parameters(), lr=lr)
-        self.criterion = nn.CrossEntropyLoss()
-
-    def train(self, train_loader, epochs=2):  # Minskade epochs till 2
-        self.model.train()
-        for _ in range(epochs):
-            for images, labels in train_loader:
-                images, labels = images.to(device), labels.to(device)
-                self.optimizer.zero_grad()
-                outputs = self.model(images)
-                loss = self.criterion(outputs, labels)
-                loss.backward()
-                self.optimizer.step()
-
-    def get_weights(self):
-        return [param.data.clone() for param in self.model.parameters()]
-
-    def set_weights(self, new_weights):
-        for param, new_weight in zip(self.model.parameters(), new_weights):
-            param.data = new_weight.clone()
-
-# Initiera klienter med tränare
-clients = []
-for i in range(num_clients):
-    model = NeuralNetwork()
-    trainer = Trainer(model, lr=0.01)
-    train_loader = DataLoader(client_datasets[i], batch_size=32, shuffle=True)  # Ökad batch size
-    clients.append((trainer, train_loader))
-
-# Initiera global modell
-num_rounds = 50  # Minskat till 50 rounds
-global_model = NeuralNetwork().to(device)
-global_trainer = Trainer(global_model, lr=0.01)
-
-# FedAvg viktaggregering
-def aggregate_weights(client_trainers):
-    aggregated_weights = []
-    trainers = [trainer for trainer, _ in client_trainers]
-    for i in range(len(trainers[0].get_weights())):
-        layer_weights = torch.stack([trainer.get_weights()[i] for trainer in trainers]).to(device)
-        aggregated_weights.append(torch.mean(layer_weights, dim=0))
-    return aggregated_weights
-
-# Evaluera modellen
-def evaluate(model, test_loader):
+# Define test function 
+def test_model(model, test_loader):
+    # Set model to evaluation mode
     model.eval()
+    # Initialize counters for correct predictions
     correct = 0
+    # Initialize total number of predictions
     total = 0
+    # Disable gradient computation
     with torch.no_grad():
+        # Iterate over the test data
         for images, labels in test_loader:
-            images, labels = images.to(device), labels.to(device)
+            # Produces ten outputs
             outputs = model(images)
+            # Choose the class with the maximum probability
             _, predicted = torch.max(outputs, 1)
-            correct += (predicted == labels).sum().item()
             total += labels.size(0)
+            # Update the counter for correct predictions
+            correct += (predicted == labels).sum().item()
+            # Return the accuracy
     return 100 * correct / total
 
-# Kör Federated Learning
+# Initialize global model
+global_model = NeuralNetwork()
+# Initialize loss function
+criterion = nn.CrossEntropyLoss()
+# Initialize test loader
+test_loader = data.DataLoader(datasets.MNIST(root="./data", train=False, download=True, transform=transform), batch_size=32, shuffle=False)
+
+# Initialize list to store accuracies
 accuracies = []
+
+# Train the global model
+import time
+# Record the start time
+start_time = time.time()
+
+# Iterate over the rounds
 for round in range(num_rounds):
-    print(f'Round {round + 1}')
+    # Record the start time of the round
+    round_start = time.time()
+    # Initialize a list to store the weights of the clients
+    client_weights = []
+    
+    # Train the local models
+    for i in range(num_clients):
+        # Initialize a local model
+        local_model = NeuralNetwork()
+        # Load the global model's weights
+        local_model.load_state_dict(global_model.state_dict())
+        # Initialize the optimizer
+        optimizer = optim.SGD(local_model.parameters(), lr=learning_rate)
+        # Initialize the data loader
+        data_loader = data.DataLoader(client_data[i], batch_size=32, shuffle=True)
+        # Train the local model
+        train_local(local_model, data_loader, optimizer, criterion)
+        # Append the local model's weights
+        client_weights.append(local_model.state_dict())
+    
+    # Compute the global weights
+    global_weights = federated_avg(client_weights)
+    # Load the global weights to the global model
+    global_model.load_state_dict(global_weights)
+    
+    # Test the global model
+    accuracy = test_model(global_model, test_loader)
+    # Append the accuracy to the list
+    accuracies.append(accuracy)
+    # Record the time it took to complete the round
+    round_time = time.time() - round_start
+    # Print the results of the round
+    print(f"Round {round+1} completed - Accuracy: {accuracy:.2f}% - Time: {round_time:.2f} sec")
 
-    # Train each client independently
-    for trainer, train_loader in clients:
-        trainer.train(train_loader, epochs=2)
-
-    # Aggregate weights and update global model
-    global_weights = aggregate_weights(clients)
-    global_trainer.set_weights(global_weights)
-
-    # Evaluate global model
-    acc = evaluate(global_model, test_loader)
-    accuracies.append(acc)
-    print(f'Validation Accuracy: {acc:.2f}%')
-
-# Visa träningsprogress
+# Plot accuracy over rounds
 plt.plot(range(1, num_rounds + 1), accuracies, marker='o')
-plt.xlabel('Federated Learning Rounds')
-plt.ylabel('Validation Accuracy (%)')
-plt.title('FedAvg Convergence')
+plt.xlabel('Round')
+plt.ylabel('Accuracy (%)')
+plt.title('Federated Learning Convergence')
 plt.grid()
-plt.show()
+total_time = time.time() - start_time
+avg_time_per_round = total_time / num_rounds
+print(f"Total training time: {total_time:.2f} seconds")
+print(f"Average time per round: {avg_time_per_round:.2f} seconds")
 
-print('Optimized federated learning simulation with FedAvg completed.')
+plt.show()
