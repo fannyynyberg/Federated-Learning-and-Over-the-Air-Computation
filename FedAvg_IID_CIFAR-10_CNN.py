@@ -9,7 +9,7 @@ matplotlib.use('Agg')  # Use non-interactive backend for plotting
 import matplotlib.pyplot as plt
 import time
 
-from CNN2 import CNN
+from CNN import CNN
 
 # Federated Learning setup
 num_clients = 10
