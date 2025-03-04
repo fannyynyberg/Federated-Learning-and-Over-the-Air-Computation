@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
-from CNN import NeuralNetwork
+from CNN1 import NeuralNetwork
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
 

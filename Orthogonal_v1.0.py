@@ -1,7 +1,7 @@
 """Functioning simple implementation of the orthogonal case with FedAvg."""
 import numpy as np
 import torch
-from CNN import NeuralNetwork, Trainer
+from CNN1 import NeuralNetwork, Trainer
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
 

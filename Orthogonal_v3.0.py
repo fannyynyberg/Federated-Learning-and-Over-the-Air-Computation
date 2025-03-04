@@ -1,3 +1,4 @@
+# Description: MNIST, NN2
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -5,12 +6,14 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend before importing pyplot
 import matplotlib.pyplot as plt
 from NN2 import NeuralNetwork
 
 # Federated Learning setup
 num_clients = 20
-num_rounds = 100
+num_rounds = 50
 epochs = 2
 learning_rate = 0.01
 
@@ -76,7 +79,7 @@ global_model = NeuralNetwork()
 # Initialize loss function
 criterion = nn.CrossEntropyLoss()
 # Initialize test loader
-test_loader = data.DataLoader(datasets.MNIST(root="./data", train=False, download=True, transform=transform), batch_size=32, shuffle=False)
+test_loader = data.DataLoader(datasets.MNIST(root="./data", train=False, download=True, transform=transform), batch_size=64, shuffle=False)
 
 # Initialize list to store accuracies
 accuracies = []
@@ -133,4 +136,8 @@ avg_time_per_round = total_time / num_rounds
 print(f"Total training time: {total_time:.2f} seconds")
 print(f"Average time per round: {avg_time_per_round:.2f} seconds")
 
-plt.show()
+#plt.show()
+
+plt.savefig("federated_learning_convergence.png")  # Saves the plot as an image file
+print("Plot saved as federated_learning_convergence.png")
+
