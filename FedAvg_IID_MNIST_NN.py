@@ -1,4 +1,4 @@
-# Description: MNIST, NN2
+"""FedAvg with IID, MNIST, and NN2"""
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend before importing pyplot
 import matplotlib.pyplot as plt
-from NN2 import NeuralNetwork
+from NN import NeuralNetwork
 
 # Federated Learning setup
 num_clients = 20
