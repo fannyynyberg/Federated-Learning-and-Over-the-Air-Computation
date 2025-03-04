@@ -35,8 +35,8 @@ test_transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
-cifar10_test = datasets.CIFAR10(root="./data", train=False, download=True, transform=test_transform)
-test_loader = data.DataLoader(cifar10_test, batch_size=64, shuffle=False)
+#cifar10_test = datasets.CIFAR10(root="./data", train=False, download=True, transform=test_transform)
+#test_loader = data.DataLoader(cifar10_test, batch_size=64, shuffle=False)
 
 # Function to train a local client model
 def train_local(client_model, data_loader, optimizer, criterion):
