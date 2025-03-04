@@ -26,9 +26,9 @@ transform = transforms.Compose([
 ])
 
 # Load CIFAR-10 dataset (training)
-cifar10_train = datasets.CIFAR10(root="./data", train=True, download=True, transform=transform)
+#cifar10_train = datasets.CIFAR10(root="./data", train=True, download=True, transform=transform)
 # Split the training data among clients
-client_data = torch.utils.data.random_split(cifar10_train, [len(cifar10_train) // num_clients] * num_clients)
+#client_data = torch.utils.data.random_split(cifar10_train, [len(cifar10_train) // num_clients] * num_clients)
 
 # Load CIFAR-10 test dataset
 test_transform = transforms.Compose([
