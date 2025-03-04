@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend before importing pyplot
 import matplotlib.pyplot as plt
-from NN2 import NeuralNetwork
+from NN import NeuralNetwork
 
 # Federated Learning setup
 num_clients = 10  # Number of clients
