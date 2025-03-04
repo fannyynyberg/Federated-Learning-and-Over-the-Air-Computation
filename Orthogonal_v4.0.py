@@ -26,17 +26,17 @@ transform = transforms.Compose([
 ])
 
 # Load CIFAR-10 dataset (training)
-#cifar10_train = datasets.CIFAR10(root="./data", train=True, download=True, transform=transform)
+cifar10_train = datasets.CIFAR10(root="./data", train=True, download=True, transform=transform)
 # Split the training data among clients
-#client_data = torch.utils.data.random_split(cifar10_train, [len(cifar10_train) // num_clients] * num_clients)
+client_data = torch.utils.data.random_split(cifar10_train, [len(cifar10_train) // num_clients] * num_clients)
 
 # Load CIFAR-10 test dataset
 test_transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
-#cifar10_test = datasets.CIFAR10(root="./data", train=False, download=True, transform=test_transform)
-#test_loader = data.DataLoader(cifar10_test, batch_size=64, shuffle=False)
+cifar10_test = datasets.CIFAR10(root="./data", train=False, download=True, transform=test_transform)
+test_loader = data.DataLoader(cifar10_test, batch_size=64, shuffle=False)
 
 # Function to train a local client model
 def train_local(client_model, data_loader, optimizer, criterion):
