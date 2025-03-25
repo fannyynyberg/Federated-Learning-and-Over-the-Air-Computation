@@ -5,7 +5,7 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
-from NN import NeuralNetwork
+from MLP import NeuralNetwork
 
 # Federated Learning setup
 num_clients = 20
