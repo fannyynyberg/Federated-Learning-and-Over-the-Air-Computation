@@ -9,11 +9,11 @@ from scipy.special import expi
 from MLP import NeuralNetwork
 
 # Federated Learning setup
-num_clients = 50
+num_clients = 20
 num_rounds = 100
-epochs = 5
+epochs = 2
 learning_rate = 0.01
-noise_variance = 0.001  # Variance for white Gaussian noise
+noise_variance = 0.01  # Variance for white Gaussian noise
 
 # AirComp parameters
 threshold = 0.2 #best: 0.2
