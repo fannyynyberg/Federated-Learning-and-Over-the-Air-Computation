@@ -11,12 +11,12 @@ from CNN import CNN
 # Federated Learning setup
 num_clients = 20
 num_rounds = 100
-epochs = 2
+epochs = 1
 learning_rate = 0.01
 noise_variance = 0.0001  # Variance for white Gaussian noise
 
 # AirComp parameters
-threshold = 0.1
+threshold = 0.2
 P0 = 0.2  # max allowed average power
 rho = P0 / (-expi(-threshold))  # rho = P0 / E1(threshold)
 
