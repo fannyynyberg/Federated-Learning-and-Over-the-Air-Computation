@@ -138,7 +138,7 @@ plt.plot(range(1, num_rounds + 1), mnist_accuracies, label="MNIST", color="blue"
 plt.plot(range(1, num_rounds + 1), cifar_accuracies, label="CIFAR-10", color="orange")
 plt.xlabel("Rounds")
 plt.ylabel("Accuracy (%)")
-plt.title("AirComp Convergence with MNIST and CIFAR-10")
+plt.title("AirComp Convergence on MNIST and CIFAR-10")
 plt.legend()
 plt.grid()
 plt.savefig("aircomp_mnist_vs_cifar10.png")
