@@ -12,8 +12,8 @@ import time
 from CNN import CNN
 
 # Federated Learning setup
-num_clients = 10
-num_rounds = 3
+num_clients = 20
+num_rounds = 100
 epochs = 1  # Number of epochs per client per round (not explicitly used below, but can be integrated)
 learning_rate = 0.01
 

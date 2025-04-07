@@ -13,8 +13,8 @@ from MLP import NeuralNetwork
 
 # Federated Learning setup
 num_clients = 20
-num_rounds = 50
-epochs = 2
+num_rounds = 100
+epochs = 1
 learning_rate = 0.01
 
 # Transformation pipeline that converts images into PyTorch tensors and normalizes pixel values
