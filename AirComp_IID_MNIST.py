@@ -16,7 +16,7 @@ learning_rate = 0.01
 noise_variance = 0.01  # Variance for white Gaussian noise
 
 # AirComp parameters
-threshold = 0.2 #best: 0.2
+threshold = 0.1 #best: 0.2
 P0 = 0.2  # max allowed average power, best 0.2
 rho = P0 / (-expi(-threshold))  # rho = P0 / E1(threshold)
 
