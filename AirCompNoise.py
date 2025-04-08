@@ -21,8 +21,8 @@ learning_rate = 0.01
 threshold = 0.2
 P0 = 0.2
 rho = P0 / (-expi(-threshold))
-noise_variances = [0.0001, 0.001, 0.01, 0.1]
-colors = ['blue', 'green', 'orange', 'red']
+noise_variances = [0.0001, 0.001, 0.01]
+colors = ['blue', 'green', 'orange']
 
 # MNIST dataset setup
 transform = transforms.Compose([transforms.ToTensor()])
