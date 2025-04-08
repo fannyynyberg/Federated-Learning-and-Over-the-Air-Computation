@@ -15,7 +15,7 @@ from CNN import CNN
 
 # Shared config
 num_clients = 20
-num_rounds = 2
+num_rounds = 100
 epochs = 1
 learning_rate = 0.01
 
