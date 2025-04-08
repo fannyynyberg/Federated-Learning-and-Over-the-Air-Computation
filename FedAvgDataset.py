@@ -121,7 +121,7 @@ plt.plot(range(1, num_rounds + 1), cifar_accuracies, label='CIFAR-10', color=col
 # Finalize and save the plot
 plt.xlabel('Rounds')
 plt.ylabel('Accuracy (%)')
-plt.title('AirComp Convergence for IID and Non-IID data')
+plt.title('FedAvg Convergence for IID and Non-IID data')
 plt.legend()
 plt.grid()
 plt.savefig("fedavg_mnist_vs_cifar10.png")
