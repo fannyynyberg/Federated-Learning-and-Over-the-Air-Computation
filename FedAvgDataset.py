@@ -15,7 +15,7 @@ from CNN import CNN
 
 # Shared config
 num_clients = 20
-num_rounds = 100
+num_rounds = 2
 epochs = 1
 learning_rate = 0.01
 
@@ -110,14 +110,20 @@ for rnd in range(num_rounds):
     cifar_accuracies.append(acc)
     print(f"[CIFAR-10] Round {rnd+1} - Accuracy: {acc:.2f}%")
 
-# ---------- FINAL PLOTTING ----------
+# === Plot ===
+colors = ['blue', 'green']  # One for IID, one for Non-IID
 plt.figure(figsize=(10, 6))
-plt.plot(range(1, num_rounds + 1), mnist_accuracies, label="MNIST", color="blue")
-plt.plot(range(1, num_rounds + 1), cifar_accuracies, label="CIFAR-10", color="orange")
-plt.xlabel("Rounds")
-plt.ylabel("Accuracy (%)")
-plt.title("FedAvg Convergence on MNIST and CIFAR-10")
+
+# Plot accuracy for both settings
+plt.plot(range(1, num_rounds + 1), mnist_accuracies, label='MNIST', color=colors[0])
+plt.plot(range(1, num_rounds + 1), cifar_accuracies, label='CIFAR-10', color=colors[1])
+
+# Finalize and save the plot
+plt.xlabel('Rounds')
+plt.ylabel('Accuracy (%)')
+plt.title('AirComp Convergence for IID and Non-IID data')
 plt.legend()
 plt.grid()
 plt.savefig("fedavg_mnist_vs_cifar10.png")
 print("\nPlot saved as fedavg_mnist_vs_cifar10.png")
+

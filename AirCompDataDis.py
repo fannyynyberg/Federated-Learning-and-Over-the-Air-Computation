@@ -5,13 +5,15 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # For environments without a display (like servers or cloud)
 import matplotlib.pyplot as plt
 from scipy.special import expi
 from MLP import NeuralNetwork
 
 # === Allmänna parametrar ===
 num_clients = 20
-num_rounds = 100
+num_rounds = 2
 epochs = 1
 learning_rate = 0.01
 threshold = 0.1
@@ -122,13 +124,19 @@ iid_accuracies = run_aircomp_iid()
 non_iid_accuracies = run_aircomp_non_iid()
 
 # === Plot ===
-plt.figure()
-plt.plot(range(1, num_rounds+1), iid_accuracies, label='AirComp IID', marker='o', markersize=3)
-plt.plot(range(1, num_rounds+1), non_iid_accuracies, label='AirComp Non-IID', marker='x', markersize=3)
+colors = ['blue', 'green']  # One for IID, one for Non-IID
+plt.figure(figsize=(10, 6))
+
+# Plot accuracy for both settings
+plt.plot(range(1, num_rounds + 1), iid_accuracies, label='FedAvg IID', color=colors[0])
+plt.plot(range(1, num_rounds + 1), non_iid_accuracies, label='FedAvg Non-IID', color=colors[1])
+
+# Finalize and save the plot
 plt.xlabel('Rounds')
 plt.ylabel('Accuracy (%)')
-plt.title('AirComp convergence on IID and Non-IID')
+plt.title('AirComp Convergence for IID and Non-IID data')
 plt.legend()
 plt.grid()
-plt.savefig("aircomp_iid_vs_non_iid.png")
-print("Plot saved as aircomp_iid_vs_non_iid.png")
+plt.savefig("federated_learning_clients_comparison.png")
+print("\nPlot saved as federated_learning_clients_comparison.png")
+

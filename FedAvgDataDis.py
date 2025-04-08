@@ -5,8 +5,11 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Match FedAvgClients.py for headless environments
 import matplotlib.pyplot as plt
 from MLP import NeuralNetwork
+
 
 # Inställningar
 num_clients = 20
@@ -113,13 +116,18 @@ iid_accuracies = run_fedavg_iid()
 non_iid_accuracies = run_fedavg_non_iid()
 
 # === Plot ===
-plt.figure()
-plt.plot(range(1, num_rounds+1), iid_accuracies, label='FedAvg IID', marker='o', markersize=3)
-plt.plot(range(1, num_rounds+1), non_iid_accuracies, label='FedAvg Non-IID', marker='x', markersize=3)
-plt.xlabel('Round')
+colors = ['blue', 'green']  # One for IID, one for Non-IID
+plt.figure(figsize=(10, 6))
+
+# Plot accuracy for both settings
+plt.plot(range(1, num_rounds + 1), iid_accuracies, label='FedAvg IID', color=colors[0])
+plt.plot(range(1, num_rounds + 1), non_iid_accuracies, label='FedAvg Non-IID', color=colors[1])
+
+# Finalize and save the plot
+plt.xlabel('Rounds')
 plt.ylabel('Accuracy (%)')
-plt.title('FedAvg convergence on IID and Non-IID')
+plt.title('FedAvg Convergence for IID and Non-IID data')
 plt.legend()
 plt.grid()
-plt.savefig("fedavg_iid_vs_non_iid.png")
-print("Plot saved as fedavg_iid_vs_non_iid.png")
+plt.savefig("federated_learning_clients_comparison.png")
+print("\nPlot saved as federated_learning_clients_comparison.png")
