@@ -89,8 +89,9 @@ def run_aircomp_iid():
             train_local(model, loader, optimizer, criterion)
             client_weights.append(model.state_dict())
         global_model.load_state_dict(aircomp_aggregate(client_weights))
-        acc.append(test_model(global_model))
-        print(f"Round {rnd+1} - Accuracy: {acc[-1]:.2f}%")
+        round_acc = test_model(global_model)
+        acc.append(round_acc)
+        print(f"Round {rnd+1} completed – Accuracy: {round_acc:.2f}%")
     return acc
 
 # === Körning för AirComp med Non-IID ===
@@ -111,8 +112,9 @@ def run_aircomp_non_iid():
             train_local(model, loader, optimizer, criterion)
             client_weights.append(model.state_dict())
         global_model.load_state_dict(aircomp_aggregate(client_weights))
-        acc.append(test_model(global_model))
-        print(f"Round {rnd+1} - Accuracy: {acc[-1]:.2f}%")
+        round_acc = test_model(global_model)
+        acc.append(round_acc)
+        print(f"Round {rnd+1} completed – Accuracy: {round_acc:.2f}%")
     return acc
 
 # === Huvudprogram ===
@@ -123,9 +125,9 @@ non_iid_accuracies = run_aircomp_non_iid()
 plt.figure()
 plt.plot(range(1, num_rounds+1), iid_accuracies, label='AirComp IID', marker='o', markersize=3)
 plt.plot(range(1, num_rounds+1), non_iid_accuracies, label='AirComp Non-IID', marker='x', markersize=3)
-plt.xlabel('Round')
+plt.xlabel('Rounds')
 plt.ylabel('Accuracy (%)')
-plt.title('AirComp FedAvg: IID vs Non-IID on MNIST')
+plt.title('AirComp convergence on IID and Non-IID')
 plt.legend()
 plt.grid()
 plt.savefig("aircomp_iid_vs_non_iid.png")
