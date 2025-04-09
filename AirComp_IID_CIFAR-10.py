@@ -49,7 +49,7 @@ def train_local(client_model, data_loader, optimizer, criterion):
         loss.backward()
         optimizer.step()
 
-"""def aircomp_aggregate(weights):
+def aircomp_aggregate(weights):
     avg_weights = {}
     num_clients = len(weights)
 
@@ -75,46 +75,6 @@ def train_local(client_model, data_loader, optimizer, criterion):
         noise = torch.normal(mean=0.0, std=noise_variance ** 0.5, size=aggregated_value.shape)
         aggregated_value += noise
         avg_weights[key] = aggregated_value / (A * np.sqrt(rho))
-
-    return avg_weights"""
-
-def aircomp_aggregate(weights):
-    avg_weights = {}
-    num_clients = len(weights)
-
-    # Simulera Rayleigh fading
-    h = np.random.rayleigh(scale=1.0, size=num_clients)
-    h_sq = h ** 2
-
-    # Tröskelvärde
-    threshold = 0.4  # Justerbar
-    P0 = 0.2
-    rho = P0 / (-expi(-threshold))  # Automatisk uppdatering
-
-    # Filtrera klienter
-    active_clients = [i for i in range(num_clients) if h_sq[i] >= threshold]
-    A = len(active_clients)
-    if A == 0:
-        raise RuntimeError("No clients passed the threshold. Adjust the threshold value.")
-
-    print(f"AirComp aggregation: {A}/{num_clients} clients active this round")
-
-    for key in weights[0].keys():
-        aggregated_value = 0.0
-        pk_list = []
-
-        for i in active_clients:
-            hi = h[i]
-            pk = np.clip(np.sqrt(rho) / hi, 0.0, 3.0)  # Begränsa pk
-            pk_list.append(pk)
-            aggregated_value += weights[i][key] * pk
-
-        # Lägg till brus
-        noise = torch.normal(mean=0.0, std=noise_variance ** 0.5, size=aggregated_value.shape)
-        aggregated_value += noise
-
-        sum_pk = sum(pk_list)
-        avg_weights[key] = aggregated_value / sum_pk  # Viktad medel
 
     return avg_weights
 
