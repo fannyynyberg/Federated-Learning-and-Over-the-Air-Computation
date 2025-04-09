@@ -120,8 +120,8 @@ colors = ['blue', 'green']  # One for IID, one for Non-IID
 plt.figure(figsize=(10, 6))
 
 # Plot accuracy for both settings
-plt.plot(range(1, num_rounds + 1), iid_accuracies, label='FedAvg IID', color=colors[0])
-plt.plot(range(1, num_rounds + 1), non_iid_accuracies, label='FedAvg Non-IID', color=colors[1])
+plt.plot(range(1, num_rounds + 1), iid_accuracies, label='IID', color=colors[0])
+plt.plot(range(1, num_rounds + 1), non_iid_accuracies, label='Non-IID', color=colors[1])
 
 # Finalize and save the plot
 plt.xlabel('Rounds')

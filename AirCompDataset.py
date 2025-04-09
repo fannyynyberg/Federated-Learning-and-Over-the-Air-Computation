@@ -21,9 +21,9 @@ epochs = 1
 learning_rate = 0.01
 
 # AirComp parameters
-threshold = 0.2
+threshold = 0.1
 P0 = 0.2
-noise_variance = 0.001
+noise_variance = 0.0001
 rho = P0 / (-expi(-threshold))
 
 # ---------- MNIST SETUP ----------
@@ -135,7 +135,7 @@ for rnd in range(num_rounds):
 # ---------- FINAL PLOTTING ----------
 plt.figure(figsize=(10, 6))
 plt.plot(range(1, num_rounds + 1), mnist_accuracies, label="MNIST", color="blue")
-plt.plot(range(1, num_rounds + 1), cifar_accuracies, label="CIFAR-10", color="orange")
+plt.plot(range(1, num_rounds + 1), cifar_accuracies, label="CIFAR-10", color="green")
 plt.xlabel("Rounds")
 plt.ylabel("Accuracy (%)")
 plt.title("AirComp Convergence on MNIST and CIFAR-10")
