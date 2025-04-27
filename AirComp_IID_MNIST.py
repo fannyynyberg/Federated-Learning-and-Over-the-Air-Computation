@@ -9,9 +9,9 @@ from scipy.special import expi
 from MLP import NeuralNetwork
 
 # Federated Learning setup
-num_clients = 20
+num_clients = 15
 num_rounds = 100
-epochs = 1
+epochs = 2
 learning_rate = 0.01
 noise_variance = 0.001  # Variance for white Gaussian noise
 
@@ -62,7 +62,8 @@ def aircomp_aggregate(weights):
             aggregated_value += weights[i][key] * pk
 
         # Add noise before normalization
-        noise = torch.normal(mean=0.0, std=noise_variance ** 0.5, size=aggregated_value.shape)
+        # noise = torch.normal(mean=0.0, std=noise_variance ** 0.5, size=aggregated_value.shape)
+        noise = 0
         aggregated_value += noise
 
         # Normalize the entire sum (signal + noise)

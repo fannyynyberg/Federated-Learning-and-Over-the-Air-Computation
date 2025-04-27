@@ -6,24 +6,22 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
 from scipy.special import expi
-from CNN import CNN  # Se till att CNN-modellen finns i samma mapp
+from SimpleCNN import SimpleCNN  # OBS! Vi kommer ändra MLP:n lite längre ner
 
 # Federated Learning setup
 num_clients = 15
 num_rounds = 100
 epochs = 2
 learning_rate = 0.01
-noise_variance = 0.001  # Varians för vit Gaussisk brus
+noise_variance = 0.0000001  # Ingen noise
 
 # AirComp parameters
 threshold = 0.1
-P0 = 0.2  # max tillåten genomsnittlig effekt
-rho = P0 / (-expi(-threshold))  # rho = P0 / E1(threshold)
+P0 = 0.5
+rho = P0 / (-expi(-threshold))
 
-# CIFAR-10 Transformation pipeline
+# CIFAR-10 Transformation pipeline (utan augmentation!)
 transform = transforms.Compose([
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(10),
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
@@ -46,6 +44,7 @@ test_transform = transforms.Compose([
 cifar10_test = datasets.CIFAR10(root="./data", train=False, download=True, transform=test_transform)
 test_loader = data.DataLoader(cifar10_test, batch_size=64, shuffle=False)
 
+
 def train_local(client_model, data_loader, optimizer, criterion):
     client_model.train()
     for images, labels in data_loader:
@@ -59,11 +58,9 @@ def aircomp_aggregate(weights):
     avg_weights = {}
     num_clients = len(weights)
 
-    # Simulera Rayleigh-fading kanaler för varje klient
     h = np.random.rayleigh(scale=1.0, size=num_clients)
     h_sq = h ** 2
 
-    # Välj aktiva klienter baserat på tröskel
     active_clients = [i for i in range(num_clients) if h_sq[i] >= threshold]
     A = len(active_clients)
     if A == 0:
@@ -77,12 +74,12 @@ def aircomp_aggregate(weights):
         for i in active_clients:
             hi = h[i]
             pk = np.sqrt(rho) / hi
-            aggregated_value += weights[i][key] * pk
+            aggregated_value += weights[i][key].float() * pk
 
-        # noise = torch.normal(mean=0.0, std=noise_variance ** 0.5, size=aggregated_value.shape)
-        noise = 0
+        noise = torch.normal(mean=0.0, std=noise_variance ** 0.5, size=aggregated_value.shape)
 
         aggregated_value += noise
+
         avg_weights[key] = aggregated_value / (A * np.sqrt(rho))
 
     return avg_weights
@@ -99,7 +96,7 @@ def test_model(model, test_loader):
     return 100 * correct / total
 
 # Initiera global modell
-global_model = CNN()
+global_model = SimpleCNN()
 criterion = nn.CrossEntropyLoss()
 accuracies = []
 
@@ -111,18 +108,16 @@ for round in range(num_rounds):
     client_weights = []
 
     for i in range(num_clients):
-        local_model = CNN()
+        local_model = SimpleCNN()
         local_model.load_state_dict(global_model.state_dict())
         optimizer = optim.SGD(local_model.parameters(), lr=learning_rate)
         data_loader = data.DataLoader(client_data[i], batch_size=32, shuffle=True)
         train_local(local_model, data_loader, optimizer, criterion)
         client_weights.append(local_model.state_dict())
 
-    # AirComp-aggregation
     global_weights = aircomp_aggregate(client_weights)
     global_model.load_state_dict(global_weights)
 
-    # Testa den globala modellen
     accuracy = test_model(global_model, test_loader)
     accuracies.append(accuracy)
     round_time = time.time() - round_start
@@ -133,7 +128,7 @@ import matplotlib.pyplot as plt
 plt.plot(range(1, num_rounds + 1), accuracies, marker='o')
 plt.xlabel('Runda')
 plt.ylabel('Noggrannhet (%)')
-plt.title('AirComp-baserad Federated Learning på CIFAR-10')
+plt.title('AirComp-baserad Federated Learning på CIFAR-10 (scnn)')
 plt.grid()
-plt.savefig("aircomp_federated_learning_convergence_cifar10.png")
-print("Plott sparad som aircomp_federated_learning_convergence_cifar10.png")
+plt.savefig("aircomp_federated_learning_convergence_cifar10_scnn_2.png")
+print("Plott sparad som aircomp_federated_learning_convergence_cifar10_scnn_2.png")
