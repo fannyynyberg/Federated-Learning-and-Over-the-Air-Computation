@@ -13,7 +13,7 @@ num_clients = 15
 num_rounds = 100
 epochs = 2
 learning_rate = 0.01
-noise_variance = 0  # Ingen noise
+noise_variance = 0
 
 # AirComp parameters
 threshold = 0.1
@@ -90,7 +90,7 @@ def aircomp_aggregate(weights):
             pk = np.sqrt(rho) / hi
             aggregated_value += weights[i][key].float() * pk
 
-        noise = 0
+        noise = 0 # Ingen noise 
         aggregated_value += noise
 
         avg_weights[key] = aggregated_value / (A * np.sqrt(rho))
