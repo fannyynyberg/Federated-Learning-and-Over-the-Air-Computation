@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from MLP import NeuralNetwork
+from MLP import MLP
 import time
 
 # Transformation pipeline
@@ -68,14 +68,14 @@ for idx, num_clients in enumerate(client_counts):
     client_lengths[-1] += len(mnist_data) - sum(client_lengths)
     client_data = torch.utils.data.random_split(mnist_data, client_lengths)
     
-    global_model = NeuralNetwork()
+    global_model = MLP()
     criterion = nn.CrossEntropyLoss()
     accuracies = []
 
     for round in range(num_rounds):
         client_weights = []
         for i in range(num_clients):
-            local_model = NeuralNetwork()
+            local_model = MLP()
             local_model.load_state_dict(global_model.state_dict())
             optimizer = optim.SGD(local_model.parameters(), lr=learning_rate)
             data_loader = data.DataLoader(client_data[i], batch_size=32, shuffle=True)

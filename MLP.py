@@ -3,11 +3,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 # Define a neural network
-class NeuralNetwork(nn.Module):
+class MLP(nn.Module):
     # Define the layers
     def __init__(self):
         # Call the parent constructor nn.Module
-        super(NeuralNetwork, self).__init__()
+        super(MLP, self).__init__()
         # Define the layers of the network
         self.fc1 = nn.Linear(28*28, 128)
         # Define the activation function

@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
 from scipy.special import expi
-from MLP import NeuralNetwork
+from MLP import MLP
 
 # Federated Learning setup
 num_clients = 20    
@@ -96,7 +96,7 @@ def test_model(model, test_loader):
     return 100 * correct / total
 
 # Initialize global model
-global_model = NeuralNetwork()
+global_model = MLP()
 criterion = nn.CrossEntropyLoss()
 test_loader = data.DataLoader(datasets.MNIST(root="./data", train=False, download=True, transform=transform), batch_size=64, shuffle=False)
 
@@ -110,7 +110,7 @@ for round in range(num_rounds):
     client_weights = []
 
     for i in range(num_clients):
-        local_model = NeuralNetwork()
+        local_model = MLP()
         local_model.load_state_dict(global_model.state_dict())
         optimizer = optim.SGD(local_model.parameters(), lr=learning_rate)
         data_loader = data.DataLoader(client_data[i], batch_size=32, shuffle=True)

@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend before importing pyplot
 import matplotlib.pyplot as plt
-from MLP import NeuralNetwork
+from MLP import MLP
 
 # Federated Learning setup
 num_clients = 20
@@ -75,7 +75,7 @@ def test_model(model, test_loader):
     return 100 * correct / total
 
 # Initialize global model
-global_model = NeuralNetwork()
+global_model = MLP()
 # Initialize loss function
 criterion = nn.CrossEntropyLoss()
 # Initialize test loader
@@ -99,7 +99,7 @@ for round in range(num_rounds):
     # Train the local models
     for i in range(num_clients):
         # Initialize a local model
-        local_model = NeuralNetwork()
+        local_model = MLP()
         # Load the global model's weights
         local_model.load_state_dict(global_model.state_dict())
         # Initialize the optimizer

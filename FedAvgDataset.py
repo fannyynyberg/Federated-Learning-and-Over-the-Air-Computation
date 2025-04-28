@@ -10,7 +10,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import time
 
-from MLP import NeuralNetwork
+from MLP import MLP
 from CNN import CNN
 
 # Shared config
@@ -71,14 +71,14 @@ def test_model(model, test_loader):
     return 100 * correct / total
 
 # ---------- RUN MNIST FEDAVG ----------
-mnist_model = NeuralNetwork()
+mnist_model = MLP()
 mnist_criterion = nn.CrossEntropyLoss()
 mnist_accuracies = []
 
 for rnd in range(num_rounds):
     client_weights = []
     for i in range(num_clients):
-        local_model = NeuralNetwork()
+        local_model = MLP()
         local_model.load_state_dict(mnist_model.state_dict())
         optimizer = optim.SGD(local_model.parameters(), lr=learning_rate)
         loader = data.DataLoader(client_data_mnist[i], batch_size=32, shuffle=True)

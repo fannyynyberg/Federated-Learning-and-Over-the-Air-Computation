@@ -6,10 +6,10 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
 from scipy.special import expi
-from SimpleCNN import SimpleCNN  # OBS! Vi kommer ändra MLP:n lite längre ner
+from CNN import CNN  # OBS! Vi kommer ändra MLP:n lite längre ner
 
 # Federated Learning setup
-num_clients = 15
+num_clients = 20
 num_rounds = 100
 epochs = 2
 learning_rate = 0.01
@@ -96,7 +96,7 @@ def test_model(model, test_loader):
     return 100 * correct / total
 
 # Initiera global modell
-global_model = SimpleCNN()
+global_model = CNN()
 criterion = nn.CrossEntropyLoss()
 accuracies = []
 
@@ -108,7 +108,7 @@ for round in range(num_rounds):
     client_weights = []
 
     for i in range(num_clients):
-        local_model = SimpleCNN()
+        local_model = CNN()
         local_model.load_state_dict(global_model.state_dict())
         optimizer = optim.SGD(local_model.parameters(), lr=learning_rate)
         data_loader = data.DataLoader(client_data[i], batch_size=32, shuffle=True)

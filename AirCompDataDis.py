@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use('Agg')  # For environments without a display (like servers or cloud)
 import matplotlib.pyplot as plt
 from scipy.special import expi
-from MLP import NeuralNetwork
+from MLP import MLP
 
 # === Allmänna parametrar ===
 num_clients = 20
@@ -78,13 +78,13 @@ def run_aircomp_iid():
     print("\n=== Running AirComp IID ===")
     mnist_data = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
     client_data = torch.utils.data.random_split(mnist_data, [len(mnist_data)//num_clients]*num_clients)
-    global_model = NeuralNetwork()
+    global_model = MLP()
     criterion = nn.CrossEntropyLoss()
     acc = []
     for rnd in range(num_rounds):
         client_weights = []
         for i in range(num_clients):
-            model = NeuralNetwork()
+            model = MLP()
             model.load_state_dict(global_model.state_dict())
             optimizer = optim.SGD(model.parameters(), lr=learning_rate)
             loader = data.DataLoader(client_data[i], batch_size=32, shuffle=True)
@@ -101,13 +101,13 @@ def run_aircomp_non_iid():
     print("\n=== Running AirComp Non-IID ===")
     mnist_data = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
     client_data = split_non_iid(mnist_data, num_clients)
-    global_model = NeuralNetwork()
+    global_model = MLP()
     criterion = nn.CrossEntropyLoss()
     acc = []
     for rnd in range(num_rounds):
         client_weights = []
         for i in range(num_clients):
-            model = NeuralNetwork()
+            model = MLP()
             model.load_state_dict(global_model.state_dict())
             optimizer = optim.SGD(model.parameters(), lr=learning_rate)
             loader = data.DataLoader(client_data[i], batch_size=32, shuffle=True)

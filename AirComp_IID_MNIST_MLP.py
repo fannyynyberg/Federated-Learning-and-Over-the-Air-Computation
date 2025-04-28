@@ -6,45 +6,24 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
 from scipy.special import expi
-from CNN import CNN  # Se till att CNN-modellen finns i samma mapp
+from MLP import MLP
 
 # Federated Learning setup
-num_clients = 15
+num_clients = 20
 num_rounds = 100
 epochs = 2
 learning_rate = 0.01
-noise_variance = 0.001  # Varians för vit Gaussisk brus
+noise_variance = 0.0000001  # Variance for white Gaussian noise
 
 # AirComp parameters
-threshold = 0.1
-P0 = 0.2  # max tillåten genomsnittlig effekt
+threshold = 0.1 #best: 0.2
+P0 = 0.5  # max allowed average power, best 0.2
 rho = P0 / (-expi(-threshold))  # rho = P0 / E1(threshold)
 
-# CIFAR-10 Transformation pipeline
-transform = transforms.Compose([
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(10),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-])
-
-# Ladda CIFAR-10 dataset (träning)
-cifar10_train = datasets.CIFAR10(root="./data", train=True, download=True, transform=transform)
-
-# Dela upp träningdata mellan klienter
-base_len = len(cifar10_train) // num_clients
-lengths = [base_len] * num_clients
-for i in range(len(cifar10_train) % num_clients):
-    lengths[i] += 1
-client_data = torch.utils.data.random_split(cifar10_train, lengths)
-
-# Ladda CIFAR-10 testdataset
-test_transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-])
-cifar10_test = datasets.CIFAR10(root="./data", train=False, download=True, transform=test_transform)
-test_loader = data.DataLoader(cifar10_test, batch_size=64, shuffle=False)
+# Transformation pipeline for MNIST dataset
+transform = transforms.Compose([transforms.ToTensor()])
+mnist_data = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
+client_data = torch.utils.data.random_split(mnist_data, [len(mnist_data)//num_clients]*num_clients)
 
 def train_local(client_model, data_loader, optimizer, criterion):
     client_model.train()
@@ -56,33 +35,38 @@ def train_local(client_model, data_loader, optimizer, criterion):
         optimizer.step()
 
 def aircomp_aggregate(weights):
+    """
+    Aggregates client weights using AirComp with channel thresholding and power control.
+    
+    """
     avg_weights = {}
     num_clients = len(weights)
 
-    # Simulera Rayleigh-fading kanaler för varje klient
+    # Simulate Rayleigh fading channels for each client
     h = np.random.rayleigh(scale=1.0, size=num_clients)
     h_sq = h ** 2
 
-    # Välj aktiva klienter baserat på tröskel
+    # Select active clients based on threshold
     active_clients = [i for i in range(num_clients) if h_sq[i] >= threshold]
     A = len(active_clients)
     if A == 0:
-        raise RuntimeError("Inga klienter passerade tröskeln. Justera threshold-värdet.")
+        raise RuntimeError("No clients passed the threshold. Adjust the threshold value.")
 
-    print(f"AirComp aggregation: {A}/{num_clients} klienter aktiva denna runda")
+    print(f"AirComp aggregation: {A}/{num_clients} clients active this round")
 
     for key in weights[0].keys():
-        aggregated_value = torch.zeros_like(weights[0][key], dtype=torch.float32)
-
+        aggregated_value = 0.0
         for i in active_clients:
             hi = h[i]
             pk = np.sqrt(rho) / hi
             aggregated_value += weights[i][key] * pk
 
+        # Add noise before normalization
         # noise = torch.normal(mean=0.0, std=noise_variance ** 0.5, size=aggregated_value.shape)
         noise = 0
-
         aggregated_value += noise
+
+        # Normalize the entire sum (signal + noise)
         avg_weights[key] = aggregated_value / (A * np.sqrt(rho))
 
     return avg_weights
@@ -98,9 +82,11 @@ def test_model(model, test_loader):
             correct += (predicted == labels).sum().item()
     return 100 * correct / total
 
-# Initiera global modell
-global_model = CNN()
+# Initialize global model
+global_model = MLP()
 criterion = nn.CrossEntropyLoss()
+test_loader = data.DataLoader(datasets.MNIST(root="./data", train=False, download=True, transform=transform), batch_size=64, shuffle=False)
+
 accuracies = []
 
 import time
@@ -111,29 +97,29 @@ for round in range(num_rounds):
     client_weights = []
 
     for i in range(num_clients):
-        local_model = CNN()
+        local_model = MLP()
         local_model.load_state_dict(global_model.state_dict())
         optimizer = optim.SGD(local_model.parameters(), lr=learning_rate)
         data_loader = data.DataLoader(client_data[i], batch_size=32, shuffle=True)
         train_local(local_model, data_loader, optimizer, criterion)
         client_weights.append(local_model.state_dict())
 
-    # AirComp-aggregation
+    # Use AirComp aggregation
     global_weights = aircomp_aggregate(client_weights)
     global_model.load_state_dict(global_weights)
 
-    # Testa den globala modellen
+    # Test the global model
     accuracy = test_model(global_model, test_loader)
     accuracies.append(accuracy)
     round_time = time.time() - round_start
-    print(f"Runda {round+1} klar - Noggrannhet: {accuracy:.2f}% - Tid: {round_time:.2f} sek")
+    print(f"Round {round+1} completed - Accuracy: {accuracy:.2f}% - Time: {round_time:.2f} sec")
 
-# Spara resultat
+# Save results
 import matplotlib.pyplot as plt
 plt.plot(range(1, num_rounds + 1), accuracies, marker='o')
-plt.xlabel('Runda')
-plt.ylabel('Noggrannhet (%)')
-plt.title('AirComp-baserad Federated Learning på CIFAR-10')
+plt.xlabel('Round')
+plt.ylabel('Accuracy (%)')
+plt.title('AirComp-Based Federated Learning Convergence')
 plt.grid()
-plt.savefig("aircomp_federated_learning_convergence_cifar10.png")
-print("Plott sparad som aircomp_federated_learning_convergence_cifar10.png")
+plt.savefig("aircomp_federated_learning_convergence.png")
+print("Plot saved as aircomp_federated_learning_convergence.png")
