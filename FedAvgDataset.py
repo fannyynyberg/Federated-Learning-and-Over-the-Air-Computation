@@ -16,7 +16,7 @@ from CNN import CNN
 # Shared config
 num_clients = 20
 num_rounds = 100
-epochs = 1
+epochs = 2
 learning_rate = 0.01
 
 # ---------- MNIST SETUP ----------

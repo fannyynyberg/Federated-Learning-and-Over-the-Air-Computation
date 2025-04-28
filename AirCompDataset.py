@@ -17,7 +17,7 @@ epochs = 2
 learning_rate = 0.01
 noise_variance = 1e-7
 threshold = 0.1
-P0 = 0.6
+P0 = 0.5
 rho = P0 / (-expi(-threshold))
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
