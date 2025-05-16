@@ -13,18 +13,18 @@ num_clients = 20
 num_rounds = 100
 epochs = 2
 learning_rate = 0.01
-noise_variance = 0.0001  # Variance for white Gaussian noise
+noise_variance = 0.0001
 
 # AirComp parameters
-threshold = 0.1 #best: 0.2 eller 0.1
-P0 = 0.2  # max allowed average power, best 0.2
-rho = P0 / (-expi(-threshold))  # rho = P0 / E1(threshold)
+threshold = 0.1
+P0 = 0.2
+rho = P0 / (-expi(-threshold))
 
 # Transformation pipeline for MNIST dataset
 transform = transforms.Compose([transforms.ToTensor()])
 mnist_data = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
 
-# -------- Non-IID PARTITIONING -------- #
+# Split MNIST dataset into non-IID client data
 def split_mnist_non_iid(mnist_dataset, num_clients, num_shards=60):
     num_samples = len(mnist_dataset)
     data_indices = np.arange(num_samples)
@@ -37,7 +37,6 @@ def split_mnist_non_iid(mnist_dataset, num_clients, num_shards=60):
 
 client_indices = split_mnist_non_iid(mnist_data, num_clients)
 client_data = {i: torch.utils.data.Subset(mnist_data, client_indices[i]) for i in range(num_clients)}
-# -------------------------------------- #
 
 def train_local(client_model, data_loader, optimizer, criterion):
     client_model.train()
@@ -49,10 +48,6 @@ def train_local(client_model, data_loader, optimizer, criterion):
         optimizer.step()
 
 def aircomp_aggregate(weights):
-    """
-    Aggregates client weights using AirComp with channel thresholding and power control.
-    
-    """
     avg_weights = {}
     num_clients = len(weights)
 
@@ -64,9 +59,9 @@ def aircomp_aggregate(weights):
     active_clients = [i for i in range(num_clients) if h_sq[i] >= threshold]
     A = len(active_clients)
     if A == 0:
-        raise RuntimeError("No clients passed the threshold. Adjust the threshold value.")
+        raise RuntimeError("No clients passed the threshold. Adjust threshold.")
 
-    print(f"AirComp aggregation: {A}/{num_clients} clients active this round")
+    print(f"AirComp aggregation: {A}/{num_clients} clients active")
 
     for key in weights[0].keys():
         aggregated_value = 0.0
@@ -75,11 +70,9 @@ def aircomp_aggregate(weights):
             pk = np.sqrt(rho) / hi
             aggregated_value += weights[i][key] * pk
 
-        # Add noise before normalization
         noise = torch.normal(mean=0.0, std=noise_variance ** 0.5, size=aggregated_value.shape)
         aggregated_value += noise
 
-        # Normalize the entire sum (signal + noise)
         avg_weights[key] = aggregated_value / (A * np.sqrt(rho))
 
     return avg_weights
@@ -95,7 +88,6 @@ def test_model(model, test_loader):
             correct += (predicted == labels).sum().item()
     return 100 * correct / total
 
-# Initialize global model
 global_model = MLP()
 criterion = nn.CrossEntropyLoss()
 test_loader = data.DataLoader(datasets.MNIST(root="./data", train=False, download=True, transform=transform), batch_size=64, shuffle=False)
@@ -117,22 +109,20 @@ for round in range(num_rounds):
         train_local(local_model, data_loader, optimizer, criterion)
         client_weights.append(local_model.state_dict())
 
-    # Use AirComp aggregation
     global_weights = aircomp_aggregate(client_weights)
     global_model.load_state_dict(global_weights)
 
-    # Test the global model
     accuracy = test_model(global_model, test_loader)
     accuracies.append(accuracy)
     round_time = time.time() - round_start
-    print(f"Round {round+1} completed - Accuracy: {accuracy:.2f}% - Time: {round_time:.2f} sec")
+    print(f"Round {round+1} completed - Accuracy: {accuracy:.2f}% - Time: {round_time:.2f} seconds")
 
 # Save results
 import matplotlib.pyplot as plt
 plt.plot(range(1, num_rounds + 1), accuracies, marker='o')
 plt.xlabel('Round')
 plt.ylabel('Accuracy (%)')
-plt.title('AirComp-Based Federated Learning Convergence (Non-IID)')
+plt.title('AirComp Non-IID MNIST MLP Convergence')
 plt.grid()
-plt.savefig("aircomp_federated_learning_convergence_non_iid.png")
-print("Plot saved as aircomp_federated_learning_convergence_non_iid.png")
+plt.savefig("aircomp_non_iid_mnist_mlp_convergence.png")
+print("Figure saved as aircomp_non_iid_mnist_mlp_convergence.png")

@@ -13,12 +13,12 @@ num_clients = 20
 num_rounds = 100
 epochs = 2
 learning_rate = 0.01
-noise_variance = 0.0000001  # Variance for white Gaussian noise
+noise_variance = 0.0000001
 
 # AirComp parameters
-threshold = 0.1 #best: 0.2
-P0 = 0.5  # max allowed average power, best 0.2
-rho = P0 / (-expi(-threshold))  # rho = P0 / E1(threshold)
+threshold = 0.1
+P0 = 0.5
+rho = P0 / (-expi(-threshold))
 
 # Transformation pipeline for MNIST dataset
 transform = transforms.Compose([transforms.ToTensor()])
@@ -35,24 +35,16 @@ def train_local(client_model, data_loader, optimizer, criterion):
         optimizer.step()
 
 def aircomp_aggregate(weights):
-    """
-    Aggregates client weights using AirComp with channel thresholding and power control.
-    
-    """
     avg_weights = {}
     num_clients = len(weights)
 
-    # Simulate Rayleigh fading channels for each client
     h = np.random.rayleigh(scale=1.0, size=num_clients)
     h_sq = h ** 2
-
-    # Select active clients based on threshold
     active_clients = [i for i in range(num_clients) if h_sq[i] >= threshold]
     A = len(active_clients)
     if A == 0:
-        raise RuntimeError("No clients passed the threshold. Adjust the threshold value.")
-
-    print(f"AirComp aggregation: {A}/{num_clients} clients active this round")
+        raise RuntimeError("No clients passed the threshold. Adjust threshold.")
+    print(f"AirComp aggregation: {A}/{num_clients} clients active")
 
     for key in weights[0].keys():
         aggregated_value = 0.0
@@ -61,12 +53,9 @@ def aircomp_aggregate(weights):
             pk = np.sqrt(rho) / hi
             aggregated_value += weights[i][key] * pk
 
-        # Add noise before normalization
-        # noise = torch.normal(mean=0.0, std=noise_variance ** 0.5, size=aggregated_value.shape)
         noise = 0
         aggregated_value += noise
 
-        # Normalize the entire sum (signal + noise)
         avg_weights[key] = aggregated_value / (A * np.sqrt(rho))
 
     return avg_weights
@@ -82,7 +71,6 @@ def test_model(model, test_loader):
             correct += (predicted == labels).sum().item()
     return 100 * correct / total
 
-# Initialize global model
 global_model = MLP()
 criterion = nn.CrossEntropyLoss()
 test_loader = data.DataLoader(datasets.MNIST(root="./data", train=False, download=True, transform=transform), batch_size=64, shuffle=False)
@@ -112,14 +100,14 @@ for round in range(num_rounds):
     accuracy = test_model(global_model, test_loader)
     accuracies.append(accuracy)
     round_time = time.time() - round_start
-    print(f"Round {round+1} completed - Accuracy: {accuracy:.2f}% - Time: {round_time:.2f} sec")
+    print(f"Round {round+1} completed - Accuracy: {accuracy:.2f}% - Time: {round_time:.2f} seconds")
 
 # Save results
 import matplotlib.pyplot as plt
 plt.plot(range(1, num_rounds + 1), accuracies, marker='o')
 plt.xlabel('Round')
 plt.ylabel('Accuracy (%)')
-plt.title('AirComp-Based Federated Learning Convergence')
+plt.title('AirComp IID MNIST MLP Convergence')
 plt.grid()
-plt.savefig("aircomp_federated_learning_convergence.png")
-print("Plot saved as aircomp_federated_learning_convergence.png")
+plt.savefig("aircomp_iid_mnist_mlp_convergence.png")
+print("Figure saved as aircomp_iid_mnist_mlp_convergence.png")
