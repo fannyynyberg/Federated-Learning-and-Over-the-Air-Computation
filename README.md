@@ -6,7 +6,7 @@ This repository contains the official implementation for the bachelor’s thesis
 **Fanny Nyberg & Filip Svebeck**  
 School of Electrical Engineering and Computer Science, KTH Royal Institute of Technology, 2025
 
-## 🎓 About the Project
+## About the Project
 
 This project investigates and compares two aggregation strategies in Federated Learning:
 
