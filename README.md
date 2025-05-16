@@ -42,5 +42,5 @@ Install the following Python packages before running:
 ```bash
 pip install torch torchvision numpy matplotlib scipy
 ```
-## License and USE
-This codebase was developed as part of a bachelor thesis at KTH and is intended for educational and research purposes.
+## License and Use
+This codebase was developed as part of a bachelor's thesis at KTH and is intended for educational and research purposes.
