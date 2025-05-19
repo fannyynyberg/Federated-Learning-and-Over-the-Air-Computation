@@ -3,15 +3,15 @@
 This repository contains the official implementation for the bachelor’s thesis:
 
 **"Federated Learning and Over-the-Air Computation: A Comparative Study"**  
-**Fanny Nyberg & Filip Svebeck**  
+** by Fanny Nyberg & Filip Svebeck**  
 School of Electrical Engineering and Computer Science, KTH Royal Institute of Technology, 2025
 
 ## About the Project
 
-This project investigates and compares two aggregation strategies in Federated Learning:
+This project investigates and compares two communication strategies in Federated Learning (FL):
 
-- **Federated Averaging (FedAvg)** – the standard federated averaging algorithm.
-- **Over-the-Air Computation (AirComp)** – aggregation by leveraging signal superposition.
+- **Orthogonal Federated Learning (FL)** – utilizing orthogonal communication and Federated Averaging (FedAvg).
+- **Over-the-Air Federated Learning (Over-the-Air FL)** – utilizing non-orthogonal communication and Over-the-Air Computation (AirComp).
 
 The goal of this thesis is to evaluate the convergence and accuracy of both methods under different settings.
 
@@ -23,17 +23,17 @@ The repository includes the following files:
 - `MLP.py` – A simple feedforward neural network used for MNIST.
 - `CNN.py` – A convolutional neural network for CIFAR-10 classification.
 
-### FedAvg Implementations
-- `FedAvg_IID_MNIST_MLP.py`
-- `FedAvg_Non-IID_MNIST_MLP.py`
-- `FedAvg_IID_CIFAR-10_CNN.py`
+### Orthogonal Federated Learning Implementations
+- `O_FL_IID_MNIST_MLP.py`
+- `O_FL_Non-IID_MNIST_MLP.py`
+- `O_FL_IID_CIFAR-10_CNN.py`
 
-### AirComp Implementations
-- `AirComp_IID_MNIST_MLP.py`
-- `AirComp_Non-IID_MNIST_MLP.py`
-- `AirComp_IID_CIFAR-10_CNN.py`
+### Over-the-Air Federated Learning Implementations
+- `Air_FL_IID_MNIST_MLP.py`
+- `Air_FL_Non-IID_MNIST_MLP.py`
+- `Air_FL_IID_CIFAR-10_CNN.py`
 
-Each script trains a global model using federated learning with the corresponding strategy and dataset.
+Each script trains a global model using FL with the corresponding strategy and dataset.
 
 ## Requirements
 
