@@ -10,7 +10,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from MLP import MLP
 
-# Federated Learning setup
 num_clients = 20
 num_rounds = 100
 epochs = 1
@@ -79,13 +78,11 @@ for round in range(num_rounds):
 plt.plot(range(1, num_rounds + 1), accuracies, marker='o')
 plt.xlabel('Round')
 plt.ylabel('Accuracy (%)')
-plt.title('FedAvg IID MNIST MLP Convergence')
+plt.title('Orthogonal FL IID MNIST MLP Convergence')
 plt.grid()
-plt.savefig("fedavg_iid_mnist_mlp_convergence.png")
-print("Figure saved as fedavg_iid_mnist_mlp_convergence.png")
-
+plt.savefig("o_fl_iid_mnist_mlp_convergence.png")
+print("Figure saved as o_fl_iid_mnist_mlp_convergence.png")
 total_time = time.time() - start_time
 avg_time_per_round = total_time / num_rounds
 print(f"Total training time: {total_time:.2f} seconds")
 print(f"Average time per round: {avg_time_per_round:.2f} seconds")
-
