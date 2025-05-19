@@ -8,19 +8,16 @@ import numpy as np
 from scipy.special import expi
 from MLP import MLP
 
-# Federated Learning setup
 num_clients = 20
 num_rounds = 100
 epochs = 2
 learning_rate = 0.01
 noise_variance = 0.0000001
 
-# AirComp parameters
 threshold = 0.1
 P0 = 0.5
 rho = P0 / (-expi(-threshold))
 
-# Transformation pipeline for MNIST dataset
 transform = transforms.Compose([transforms.ToTensor()])
 mnist_data = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
 client_data = torch.utils.data.random_split(mnist_data, [len(mnist_data)//num_clients]*num_clients)
@@ -92,17 +89,14 @@ for round in range(num_rounds):
         train_local(local_model, data_loader, optimizer, criterion)
         client_weights.append(local_model.state_dict())
 
-    # Use AirComp aggregation
     global_weights = aircomp_aggregate(client_weights)
     global_model.load_state_dict(global_weights)
 
-    # Test the global model
     accuracy = test_model(global_model, test_loader)
     accuracies.append(accuracy)
     round_time = time.time() - round_start
     print(f"Round {round+1} completed - Accuracy: {accuracy:.2f}% - Time: {round_time:.2f} seconds")
 
-# Save results
 import matplotlib.pyplot as plt
 plt.plot(range(1, num_rounds + 1), accuracies, marker='o')
 plt.xlabel('Round')
