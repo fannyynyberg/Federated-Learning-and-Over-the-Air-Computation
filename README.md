@@ -13,7 +13,7 @@ This project investigates and compares two communication strategies in Federated
 - **Orthogonal Federated Learning (FL)** – utilizing orthogonal communication and Federated Averaging (FedAvg).
 - **Over-the-Air Federated Learning (Over-the-Air FL)** – utilizing non-orthogonal communication and Over-the-Air Computation (AirComp).
 
-The goal of this thesis is to evaluate the convergence and accuracy of both methods under different settings.
+The goal of this thesis is to evaluate the convergence, accuracy, and communication efficiency of both methods under different settings.
 
 ## Project Structure
 
