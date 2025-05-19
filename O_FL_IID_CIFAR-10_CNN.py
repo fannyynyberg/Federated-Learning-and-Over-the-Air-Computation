@@ -94,10 +94,10 @@ plt.figure()
 plt.plot(range(1, num_rounds + 1), accuracies, marker='o')
 plt.xlabel('Round')
 plt.ylabel('Accuracy (%)')
-plt.title('FedAvg IID CIFAR-10 CNN Convergence')
+plt.title('Orthogonal FL IID CIFAR-10 CNN Convergence')
 plt.grid()
-plt.savefig("fedavg_iid_cifar10_cnn_convergence.png")
-print("Figure saved as fedavg_iid_cifar10_cnn_convergence.png")
+plt.savefig("o_fl_iid_cifar10_cnn_convergence.png")
+print("Figure saved as o_fl_iid_cifar10_cnn_convergence.png")
 total_time = time.time() - start_time
 avg_time_per_round = total_time / num_rounds
 print(f"Total training time: {total_time:.2f} seconds")
