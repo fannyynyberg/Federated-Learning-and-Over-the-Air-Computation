@@ -11,13 +11,11 @@ import time
 
 from CNN import CNN
 
-# Federated Learning setup
 num_clients = 20
 num_rounds = 100
 epochs = 1
 learning_rate = 0.01
 
-# Transformation pipeline for CIFAR-10
 transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(10),
@@ -100,7 +98,6 @@ plt.title('FedAvg IID CIFAR-10 CNN Convergence')
 plt.grid()
 plt.savefig("fedavg_iid_cifar10_cnn_convergence.png")
 print("Figure saved as fedavg_iid_cifar10_cnn_convergence.png")
-
 total_time = time.time() - start_time
 avg_time_per_round = total_time / num_rounds
 print(f"Total training time: {total_time:.2f} seconds")
