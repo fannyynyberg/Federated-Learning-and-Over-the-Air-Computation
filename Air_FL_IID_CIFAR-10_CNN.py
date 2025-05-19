@@ -8,19 +8,16 @@ import numpy as np
 from scipy.special import expi
 from CNN import CNN
 
-# Federated Learning setup
 num_clients = 20
 num_rounds = 100
 epochs = 2
 learning_rate = 0.01
 noise_variance = 0.0000001
 
-# AirComp parameters
 threshold = 0.1
 P0 = 0.5
 rho = P0 / (-expi(-threshold))
 
-# CIFAR-10 transformation pipeline
 transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
