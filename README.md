@@ -3,7 +3,7 @@
 This repository contains the official implementation for the bachelor’s thesis:
 
 **"Federated Learning and Over-the-Air Computation: A Comparative Study"**  
-** by Fanny Nyberg & Filip Svebeck**  
+**by Fanny Nyberg & Filip Svebeck**  
 School of Electrical Engineering and Computer Science, KTH Royal Institute of Technology, 2025
 
 ## About the Project
