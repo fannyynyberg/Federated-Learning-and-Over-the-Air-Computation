@@ -14,7 +14,6 @@ For more information, see the corresponding thesis report:
 TRITA-EECS-EX-2025:140
 """
 
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
