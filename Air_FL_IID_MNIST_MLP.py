@@ -1,7 +1,7 @@
 """
 Federated Learning and Over-the-Air Computation
 ------------------------------------------------
-This script is part of a bachelors thesis project evaluating the performance of Orthogonal FL 
+This script is part of a bachelor’s thesis project evaluating the performance of Orthogonal FL 
 and Over-the-Air FL under different system and data conditions.
 
 Author: Filip Svebeck and Fanny Nyberg
