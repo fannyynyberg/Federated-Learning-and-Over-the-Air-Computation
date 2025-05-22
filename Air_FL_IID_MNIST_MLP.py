@@ -1,3 +1,19 @@
+"""
+Federated Learning and Over-the-Air Computation
+------------------------------------------------
+This script is part of a bachelors thesis project evaluating the performance of Orthogonal FL 
+and Over-the-Air FL under different system and data conditions.
+
+Author: Filip Svebeck and Fanny Nyberg
+Date: Spring 2025
+Institution: KTH Royal Institute of Technology
+Course: EF112X
+
+For more information, see the corresponding thesis report:
+"Federated Learning and Over-the-Air Computation: A Comparative Study"
+TRITA-EECS-EX-2025:140
+"""
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
